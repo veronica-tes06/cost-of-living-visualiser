@@ -52,12 +52,12 @@ DEFAULT_BASKET = [
 ]
 GROUPS = [RENT, HOUSEHOLD_BILLS, TRANSPORT, GROCERIES, EATING_OUT, LEISURE]
 
-# Dashboard categories combine groceries and eating out under Food.
+# Shared report and dashboard categories for basket groups.
 BASKET_CATEGORIES = {
     HOUSEHOLD_BILLS: HOUSEHOLD_BILLS,
     TRANSPORT: TRANSPORT,
     GROCERIES: "Food",
-    EATING_OUT: "Food",
+    EATING_OUT: LEISURE,
     LEISURE: LEISURE,
 }
 
