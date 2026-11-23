@@ -65,7 +65,7 @@ SURFACE, INK, INK2, MUTED, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#898781", "#
 BLUES = LinearSegmentedColormap.from_list("blues", ["#f0efec", "#cde2fb", "#6da7ec", "#2a78d6", "#104281"])
 SOURCE = "Source: Numbeo prices (europe_allyouneed.csv). Rent = 1-bed apartment outside city centre."
 
-# Set shared chart styles with plt.rcParams.update(), as in Lab 1.
+# Shared chart styles for every figure.
 plt.rcParams.update({
     "figure.dpi": 110, "figure.facecolor": SURFACE, "axes.facecolor": SURFACE,
     "savefig.facecolor": SURFACE, "font.family": "DejaVu Sans", "font.size": 10, "text.color": INK,
@@ -106,7 +106,7 @@ def build_table() -> pd.DataFrame:
 
 
 def finish(fig, ax, name, subtitle, note=SOURCE):
-    """Add the subtitle and source, then save a 180 dpi PNG and a tightly cropped SVG as in Lab 1."""
+    """Add the subtitle and source, then save a 180 dpi PNG and a tightly cropped SVG."""
     if subtitle:
         ax.text(0, 1.02, subtitle, transform=ax.transAxes, color=INK2, fontsize=10, va="bottom")
     fig.text(0.01, 0.005, note, color=MUTED, fontsize=8, va="bottom")
@@ -118,7 +118,7 @@ def finish(fig, ax, name, subtitle, note=SOURCE):
 
 
 def style_bars(ax, axis="x"):
-    """Draw a light grid behind the bars using ax.grid and set_axisbelow, as in Lab 1."""
+    """Draw a light grid behind the bars."""
     ax.grid(axis=axis, alpha=0.6)
     ax.set_axisbelow(True)
 
@@ -126,7 +126,7 @@ def style_bars(ax, axis="x"):
 # ------------------------------------------------------------------ 1-9
 def g1_wage_vs_cost(t):
     d = t.dropna(subset=["Minimum wage"]).sort_values("Minimum wage")
-    y = np.arange(len(d))          # Place grouped bars at ± h/2 (Lab 1, section 8).
+    y = np.arange(len(d))          # Place the two bars for each country at ± h/2.
     h = 0.38
     fig, ax = plt.subplots(figsize=(10, 9))
     ax.barh(y + h / 2, d["Minimum wage"], height=h, color=WAGE_C, label="Monthly minimum wage")
@@ -186,7 +186,7 @@ def g4_scatter(t):
     """Answer the planning question about whether countries with higher minimum wages cost more to live in."""
     t = t.dropna(subset=["Minimum wage"])
     fig, ax = plt.subplots(figsize=(10, 7))
-    # Lab 1, section 5: encode a third variable with scatter colour and add fig.colorbar.
+    # Colour shows a third variable (rent share), explained by the colour bar.
     points = ax.scatter(t["Total cost"], t["Minimum wage"], c=t["Rent share %"], cmap=BLUES,
                         s=70, alpha=0.95, edgecolors=INK2, linewidths=0.4, zorder=3)
     fig.colorbar(points, ax=ax, label="Rent as % of the monthly cost", format=PercentFormatter(decimals=0))
@@ -216,7 +216,7 @@ def g4_scatter(t):
 def g5_heatmap(t):
     share = t[CATS].div(t["Total cost"], axis=0).sort_values("Rent", ascending=False) * 100
     fig, ax = plt.subplots(figsize=(8, 11))
-    im = ax.imshow(share.values, cmap=BLUES, aspect="auto", vmin=0)     # As in the scientific visualisation lab.
+    im = ax.imshow(share.values, cmap=BLUES, aspect="auto", vmin=0)     # Darker = larger share.
     ax.set_xticks(range(len(CATS)), labels=CATS)
     ax.set_yticks(range(len(share)), labels=share.index)
     ax.xaxis.tick_top(); ax.tick_params(length=0)
@@ -262,7 +262,7 @@ def g6_rent_burden(t):
 
 
 def g7b_map_html(t):
-    """Build an interactive Plotly Express map with update_geos and write_html, as in the scientific visualisation lab."""
+    """Build an interactive map of the affordability ratio and save it as an HTML file."""
     import plotly.express as px
     d = t.reset_index().rename(columns={"index": "country"})
     fig = px.choropleth(d, locations="country", locationmode="country names",
@@ -325,9 +325,9 @@ def g9_rent_centre(t):
            "Source: Numbeo prices (europe_allyouneed.csv).")
 
 
-# ------------------------------------------------------------------ 10-14 (additional chart types from class)
+# ------------------------------------------------------------------ 10-14 (other chart types)
 def g10_pie(t, country="Ireland"):
-    """Lab 1, section 4: use a pie chart because the five categories make up the whole budget."""
+    """Pie charts work here because the five categories add up to the whole budget."""
     median_basket = t[CATS].median()
     fig, axes = plt.subplots(1, 2, figsize=(11, 5.4))
     for ax, values, title in ((axes[0], t.loc[country, CATS], f"{country} · {money(t.at[country, 'Total cost'])}/month"),
@@ -349,7 +349,7 @@ def g10_pie(t, country="Ireland"):
 
 
 def g11_histogram(t):
-    """Lab 1, section 6: show the same data with fewer and more bins and mark the median."""
+    """Show the same data with fewer and more bins and mark the median, since bin width changes the shape."""
     med = t["Total cost"].median()
     fig, axes = plt.subplots(1, 2, figsize=(11, 4.4), sharey=False)
     for ax, bins, title in ((axes[0], 5, "Few bins: coarse summary"), (axes[1], 15, "More bins: more detail")):
@@ -372,7 +372,7 @@ def g11_histogram(t):
 
 
 def g12_boxplot(t):
-    """Lab 1, section 7: use ax.boxplot to compare distributions between groups."""
+    """Compare the spread of monthly cost between regions."""
     order = list(REGIONS)
     data_by_region = [t.loc[t["Region"] == r, "Total cost"] for r in order]
     fig, ax = plt.subplots(figsize=(10, 5.5))
@@ -394,7 +394,7 @@ def g12_boxplot(t):
 
 
 def g13_line(t):
-    """Lab 1, sections 2 and 9: use ax.plot with markers and ax.annotate with an arrow."""
+    """Share of countries where each salary covers the monthly cost, with the median salary marked."""
     salaries = np.arange(400, 4001, 100)
     covered = np.array([(t["Total cost"] <= s).mean() * 100 for s in salaries])
     fig, ax = plt.subplots(figsize=(10, 5))
@@ -417,7 +417,7 @@ def g13_line(t):
 
 
 def g14_dashboard(t):
-    """Lab 1, section 8: use three subplots for three questions, each with a different visual encoding."""
+    """Three panels for three questions (compare, relate, distribute), each with a different chart type."""
     fig, axes = plt.subplots(1, 3, figsize=(16, 4.6))
     mw = t.dropna(subset=["Minimum wage"])
     top = mw.sort_values("Remaining (min wage)").tail(10)
