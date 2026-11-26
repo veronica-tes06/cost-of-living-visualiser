@@ -17,3 +17,7 @@ venv/
 # Editors
 .vscode/
 .idea/
+
+# Jupyter
+notebooks/iframe_figures/
+notebooks/outputs/
